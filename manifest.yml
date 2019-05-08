@@ -1,8 +1,5 @@
+---
 applications:
-  - path: .
-    name: vtscloud
-    environment_json: {}
-    memory: 256M
-    instances: 1
-    disk_quota: 1024M
-    services: []
+ - name: GetStartedNode
+   random-route: true
+   memory: 256M
