@@ -78,7 +78,9 @@ var vcapLocal;
 try {
   vcapLocal = require('./vcap-local.json');
   console.log("Loaded local VCAP", vcapLocal);
-} catch (e) {}
+} catch (e) {
+  console.log("Loaded local VCAP is missing.");
+}
 
 const appEnvOpts = vcapLocal ? {
   vcap: vcapLocal
