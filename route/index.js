@@ -19,7 +19,11 @@ router.get('/', function (req, res, next) {
   });
 router.get('/login', passport.authenticate('saml'));
 
-router.post('/login',
+//这里之前是 success ，提示回调 post /login的时候找不到， 改成login就好了， 应该是哪个地方有设置
+//ACS HTTP Posthttps://vtscloud.mybluemix.net/login 就这里设置的
+//我用的本地的设置这里是 success，所以要在本地测试需要改成 success ，pub到cloud时，得改回 login
+//有空给改成一样的，已改，等带验证
+router.post('/success',
     patchSAMLRequest,
     passport.authenticate('saml', {
         successRedirect: '/success',
@@ -35,8 +39,6 @@ router.get('/success', isLoggedIn, function (req, res, next) {
   router.get('/error', function (req, res, next) {
     res.render('error');
   });
-
-
 
 /* Endpoint to greet and add a new visitor to database.
  * Send a POST request to localhost:3000/api/visitors with body
