@@ -16,8 +16,9 @@ var fs = require('fs');
 var session = require("express-session");
 
 var configurePassport = require('./config/passport')
-const shouldConfigureLocal = true;
-//const shouldConfigureLocal = process.env.NODE_ENV === 'development';
+//const shouldConfigureLocal = true;
+//这里这个值在cloud是  production ，在local 是 undefined ，不知道是在哪里设置的
+const shouldConfigureLocal = process.env.NODE_ENV === 'production';
 var privateKey = fs.readFileSync('cert/private.pem', 'utf8');
 var certificate = fs.readFileSync('cert/file.crt', 'utf8')
 var credentials = {

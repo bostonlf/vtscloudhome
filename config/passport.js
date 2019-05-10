@@ -80,7 +80,7 @@ function deserializeUser(userId, done) {
  */
 function configurePassport (passport, shouldConfigureLocal) {
   // Determine which SAML configuration is needed based on the environment of this application.
-    const samlConfig = shouldConfigureLocal ? SAML_LOCAL_CONFIG : SAML_BLUEMIX_CONFIG;
+    const samlConfig = shouldConfigureLocal ? SAML_BLUEMIX_CONFIG : SAML_LOCAL_CONFIG;
   //const samlConfig = SAML_BLUEMIX_CONFIG;
 
   // Add SAML strategy to passport.
