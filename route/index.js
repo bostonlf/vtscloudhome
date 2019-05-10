@@ -18,7 +18,8 @@ router.get('/', function (req, res, next) {
     res.render('index');
   });
 router.get('/login', passport.authenticate('saml'));
-router.post('/success',
+
+router.post('/login',
     patchSAMLRequest,
     passport.authenticate('saml', {
         successRedirect: '/success',
