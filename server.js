@@ -17,6 +17,7 @@ var session = require("express-session");
 
 var configurePassport = require('./config/passport')
 const shouldConfigureLocal = true;
+//const shouldConfigureLocal = process.env.NODE_ENV === 'development';
 var privateKey = fs.readFileSync('cert/private.pem', 'utf8');
 var certificate = fs.readFileSync('cert/file.crt', 'utf8')
 var credentials = {

@@ -1,6 +1,10 @@
 var express = require('express');
 var http = require('http');
 var fs = require('fs');
+var cfenv = require("cfenv");
+const appEnv = cfenv.getAppEnv({});
+
+
 var isLoggedIn = require('../middleware/isLoggedIn');
 var patchSAMLRequest = require('../middleware/patchSAMLRequest');
 const router = express.Router();
@@ -11,7 +15,9 @@ function configureRoutes(passport) {
 
 router.get("/test", function (req, res) {
 console.log("teststart");
-    res.send("this test");
+var mytest = process.env.NODE_ENV;
+var appEnvINFO = JSON.stringify(appEnv);
+    res.send("this test"+mytest+"appEnvINFO:"+appEnvINFO);
 })
 
 router.get('/', function (req, res, next) {
@@ -38,6 +44,12 @@ router.get('/success', isLoggedIn, function (req, res, next) {
   });
   router.get('/error', function (req, res, next) {
     res.render('error');
+  });
+
+// Log the user out of the application and send them home.
+router.get('/logout', (request, response) => {
+    request.logout();
+    response.redirect('/');
   });
 
 /* Endpoint to greet and add a new visitor to database.
