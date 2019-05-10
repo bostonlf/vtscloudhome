@@ -1,20 +1,41 @@
 var express = require('express');
-var mydb = require('../DB/cloudant');
-// var http = require('http');
-// var fs = require('fs');
-// var isLoggedIn = require('../middleware/isLoggedIn');
-// var patchSAMLRequest = require('../middleware/patchSAMLRequest');
+var http = require('http');
+var fs = require('fs');
+var isLoggedIn = require('../middleware/isLoggedIn');
+var patchSAMLRequest = require('../middleware/patchSAMLRequest');
 const router = express.Router();
+var mydb = require('../DB/cloudant');
 
 /* GET home page. */
 function configureRoutes(passport) {
 
 router.get("/test", function (req, res) {
-
 console.log("teststart");
     res.send("this test");
-
 })
+
+router.get('/', function (req, res, next) {
+    res.render('index');
+  });
+router.get('/login', passport.authenticate('saml'));
+router.post('/success',
+    patchSAMLRequest,
+    passport.authenticate('saml', {
+        successRedirect: '/success',
+        failureRedirect: '/error',
+    })
+);
+router.get('/success', isLoggedIn, function (req, res, next) {
+    console.log(req.user);
+    res.render('success', {
+        user: req.user
+    });
+  });
+  router.get('/error', function (req, res, next) {
+    res.render('error');
+  });
+
+
 
 /* Endpoint to greet and add a new visitor to database.
  * Send a POST request to localhost:3000/api/visitors with body
@@ -75,30 +96,6 @@ router.post("/api/visitors", function(request, response) {
     });
   });
   
-
-
-
-    // router.get('/', function (req, res, next) {
-    //     res.render('index');
-    //   });
-    // router.get('/login', passport.authenticate('saml'));
-    // router.post('/success',
-    //     patchSAMLRequest,
-    //     passport.authenticate('saml', {
-    //         successRedirect: '/success',
-    //         failureRedirect: '/error',
-    //     })
-    // );
-    // router.get('/success', isLoggedIn, function (req, res, next) {
-    //     console.log(req.user);
-    //     res.render('success', {
-    //         user: req.user
-    //     });
-    //   });
-    //   router.get('/error', function (req, res, next) {
-    //     res.render('error');
-    //   });
-
     return router;
 }
 
