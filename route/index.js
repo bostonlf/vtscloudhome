@@ -3,6 +3,7 @@ var http = require('http');
 var fs = require('fs');
 var cfenv = require("cfenv");
 const appEnv = cfenv.getAppEnv({});
+const jwt = require('jsonwebtoken');
 
 
 var isLoggedIn = require('../middleware/isLoggedIn');
@@ -10,20 +11,14 @@ var patchSAMLRequest = require('../middleware/patchSAMLRequest');
 const router = express.Router();
 var mydb = require('../DB/cloudant');
 
+// 密钥
+const Tokensecret = 'vtscloud';
+
 /* GET home page. */
 function configureRoutes(passport) {
 
-router.get("/test", function (req, res) {
-console.log("teststart");
-var mytest = process.env.NODE_ENV;
-var appEnvINFO = JSON.stringify(appEnv);
-    res.send("this test"+mytest+"appEnvINFO:"+appEnvINFO);
-})
+    router.get('/login', passport.authenticate('saml'));
 
-router.get('/', function (req, res, next) {
-    res.render('index');
-  });
-router.get('/login', passport.authenticate('saml'));
 
 //这里之前是 success ，提示回调 post /login的时候找不到， 改成login就好了， 应该是哪个地方有设置
 //ACS HTTP Posthttps://vtscloud.mybluemix.net/login 就这里设置的
@@ -38,8 +33,27 @@ router.post('/success',
 );
 router.get('/success', isLoggedIn, function (req, res, next) {
     console.log(req.user);
+    //A cookies shoud be generated here cookies:{w3idlogin:true,projectUser:true}
+    //projectUser:true success
+    //projectUser:failed usernotexisting
+
+    var UserINFO={
+        userID:"feilv@cn.ibm.com",
+        usergroup:"admin",
+        otherINFO:"otherINFO"
+        };
+
+//   // Token 数据
+const payload = UserINFO;//这里必须是个json
+// // 密钥
+// 签发 Token
+const token = jwt.sign(payload, Tokensecret, { expiresIn: '1day' });
+// 输出签发的 Token
+console.log(token);
+res.cookie("Usertoken",token,{maxAge: 900000, httpOnly: true});
     res.render('success', {
-        user: req.user
+        user: req.user,
+        logintoken:token
     });
   });
   router.get('/error', function (req, res, next) {
@@ -51,6 +65,54 @@ router.get('/logout', (request, response) => {
     request.logout();
     response.redirect('/');
   });
+
+
+    router.use(function (req, res, next) {//這個每次都走
+        console.log("x111111111111111111111111111x");
+        var Usertoken=req.cookies.Usertoken;
+        function mytest(){
+            var res="";
+            jwt.verify(Usertoken, Tokensecret, (error, decoded) => {
+                if (error) {
+                console.log("error : "+error.message);
+                res = "error";
+                }else{
+                    console.log(decoded);
+                    //res.render('mytest',{"testMSG":testMSG});
+                    res="good";
+                }
+            })
+            return res;
+        }
+        var tokentest = mytest();//這裏需要寫成function，不然404
+        if(tokentest=="error"){
+            console.log("tokentest:"+tokentest);
+            res.render('mytest',{"testMSG":"Please re-login"});
+        }else{
+            console.log("tokentest:"+tokentest);
+            next();
+        }
+      });
+
+router.get("/test", function (req, res) {
+    var Usertoken=req.cookies.Usertoken;
+    var testMSG = "start";
+console.log("teststart");
+console.log("testUserToken : "+Usertoken);
+
+//1 check cookies (token)
+res.render('mytest',{"testMSG":testMSG});
+    // var mytest = process.env.NODE_ENV;
+    // var appEnvINFO = JSON.stringify(appEnv);
+    //res.send("this test"+mytest+"appEnvINFO:"+appEnvINFO);
+})
+
+router.get('/', function (req, res, next) {
+    res.render('index');
+  });
+
+
+
 
 /* Endpoint to greet and add a new visitor to database.
  * Send a POST request to localhost:3000/api/visitors with body

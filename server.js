@@ -14,10 +14,12 @@ var https = require('https');
 var passport = require('passport');
 var fs = require('fs');
 var session = require("express-session");
+var createError = require('http-errors');
 
 var configurePassport = require('./config/passport')
 //const shouldConfigureLocal = true;
 //这里这个值在cloud是  production ，在local 是 undefined ，不知道是在哪里设置的
+//另外，不知道在哪里调用环境变量
 const shouldConfigureLocal = process.env.NODE_ENV === 'production';
 var privateKey = fs.readFileSync('cert/private.pem', 'utf8');
 var certificate = fs.readFileSync('cert/file.crt', 'utf8')
@@ -74,8 +76,29 @@ app.use('/static', express.static(path.resolve(__dirname, './static')));
 // Add routes to app
 app.use(configureRoutes(passport));
 
+app.get("/aabbcc",function(req,res){
 
-//do not forget add 404 to here
+  res.send("aabbcc");
+
+});
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  console.log("4444444444444");
+  // render the error page
+  res.status(err.status || 500);
+  res.redirect('./page_404.html');
+});
 
 var httpsServer = https.createServer(credentials, app)
 var sslport = 3001;
