@@ -86,6 +86,7 @@
 				  data: JSON.stringify({name: name })
 				})
                 .done(function(data) {
+                    console.log(data);
                     if(data && data.name){
                         if(data._id)
                             $('#response').html($.i18n('added_to_database', AntiXSS.sanitizeInput(data.name)));
