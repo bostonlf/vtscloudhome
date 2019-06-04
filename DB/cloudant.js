@@ -37,18 +37,37 @@ if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
 } else if (process.env.CLOUDANT_URL) {
   cloudant = Cloudant(process.env.CLOUDANT_URL);
 }
-if (cloudant) {
-  //database name
-  var dbName = 'mydb';
 
-  // Create a new "mydb" database.
-  cloudant.db.create(dbName, function(err, data) {
-    if (!err) //err if database doesn't already exists
-      console.log("Created database: " + dbName);
-  });
+// if (cloudant) {
+//   //database name
+//   var dbName = 'mydb';
 
-  // Specify the database we are going to use (mydb)...
-  mydb = cloudant.db.use(dbName);
+//   // Create a new "mydb" database.
+//   cloudant.db.create(dbName, function(err, data) {
+//     if (!err) //err if database doesn't already exists
+//       console.log("Created database: " + dbName);
+//   });
+
+//   // Specify the database we are going to use (mydb)...
+//   mydb = cloudant.db.use(dbName);
+// }
+
+function initDBConnection(dbName){  //这里有个大问题，如果DB不存在，就无法创建doc
+var mydb;
+  if (cloudant) {
+    //database name
+    var dbName = dbName;
+    // Create a new "mydb" database.
+    cloudant.db.create(dbName, function(err, data) {
+      if (!err) //err if database doesn't already exists
+        console.log("Created database: " + dbName);
+    });
+    // Specify the database we are going to use (mydb)...
+    mydb = cloudant.db.use(dbName);
+  }
+return mydb;
+
 }
 
-module.exports = mydb;
+module.exports = initDBConnection
+// module.exports = mydb;

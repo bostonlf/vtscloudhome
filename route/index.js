@@ -12,6 +12,8 @@ const router = express.Router();
 var mydb = require('../DB/cloudant');
 var DBhandler = require('../DB/DBhandler');
 
+
+mydb = mydb("mydb");
 //bodyParser 需要用，不然JS裏接收不了數據
 // parse application/x-www-form-urlencoded
 router.use(bodyParser.urlencoded({
@@ -27,7 +29,7 @@ const Tokensecret = 'vtscloud';
 /* GET home page. */
 function configureRoutes(passport) {
 
-    router.get('/login', passport.authenticate('saml'));
+    router.get('/login', passport.authenticate('saml'));//这里会从前端返回一个backurl参数，想办法弄到，直接跳转回去
     //这里之前是 success ，提示回调 post /login的时候找不到， 改成login就好了， 应该是哪个地方有设置
     //ACS HTTP Posthttps://vtscloud.mybluemix.net/login 就这里设置的
     //我用的本地的设置这里是 success，所以要在本地测试需要改成 success ，pub到cloud时，得改回 login
@@ -40,25 +42,42 @@ function configureRoutes(passport) {
         })
     );
     router.get('/success', isLoggedIn, function (req, res, next) {
-        console.log(req.user);
+        console.log("First time login successfully , IBMuserINFO:"+JSON.stringify(req.user));
+
+        // {
+        //     "issuer": {
+        //         "_": "https://w3id.alpha.sso.ibm.com/auth/sps/samlidp2/saml20",
+        //         "$": {
+        //             "Format": "urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
+        //         }
+        //     },
+        //     "sessionIndex": "uuidfd52c0ae-016a-148d-b7d0-a3e9d282deec",
+        //     "nameID": "feilv@cn.ibm.com",
+        //     "nameIDFormat": "urn:ibm:names:ITFIM:5.1:accessmanager",
+        //     "firstName": "Fei",
+        //     "uid": "053946672",
+        //     "lastName": "Lv",
+        //     "emailaddress": "feilv@cn.ibm.com",
+        //     "cn": "Fei Lv",
+        //     "blueGroups": ["cn=ITSAS General Access 1,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=user - perf,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=BSO-AP-GCG_CN-BJ-CDL-DEP2,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=BSO-AP-GCG_CN-SH-CDL-ShuiOn1,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=BSO-AP-GCG_TW-CDL-ALL2,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=BSO-AP-GCG_HK-G6O-SWG-G2,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=BSO-AP-GCG_CN-XA-CDL-DEP2,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=BSO-AP-GCG_CN-NB-CDL-DEP1,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=rptHRMS_cn,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=BSO-AP-GCG_CN-XA-CSTL-DEP2,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=ratsuite183_RTCuser,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=MS__OFFICE__2013SE__B,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=MS__OFFICE__2010SE__MASTER,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=MS__OFFICE__2013SE__MASTER,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=MS__OFFICE__2011SE__MASTER,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=LIS Regular China,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=legalibm,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=WSE - Order&Workflow Squad,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=w3id-saml-adopters-techcontacts,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=HRMS_employees_ch_hk,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=pSeriesADS,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=ThinkNews,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=SH IBM Reqular 201808,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=SH IBM Reqular 201808-1,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=SH IBM Reqular 201808 P,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=G_China_Grp,ou=memberlist,ou=ibmgroups,o=ibm.com", "cn=MD test group1,ou=memberlist,ou=ibmgroups,o=ibm.com"]
+        // }
+
         //A cookies shoud be generated here cookies:{w3idlogin:true,projectUser:true}
         //projectUser:true success
         //projectUser:failed usernotexisting
-        var UserINFO = {
-            userID: "feilv@cn.ibm.com",
-            usergroup: "admin",
-            otherINFO: "otherINFO"
-        };
+        var UserINFO = req.user;
 
         // Token 数据
         const payload = UserINFO;//这里必须是个json
         // 签发 Token
         const token = jwt.sign(payload, Tokensecret, { expiresIn: '1day' });
         // 输出签发的 Token
-        console.log(token);
+        console.log("first time set tokken , and generate cookie ,token:"+token);
+        console.log("cookie IBMuserINFO:"+JSON.stringify(req.user));
         res.cookie("Usertoken", token, { maxAge: 900000, httpOnly: true });
+        res.cookie("IBMuserINFO", req.user, { maxAge: 900000, httpOnly: true });
         res.render('success', {
-            user: req.user,
+            user: req.user.uid,
             logintoken: token
         });
     });
@@ -74,7 +93,7 @@ function configureRoutes(passport) {
     });
 
     router.use(function (req, res, next) {//這個每次都走
-        console.log("x111111111111111111111111111x");
+        console.log("@@@@@@@@@@@@@check Usertoken start@@@@@@@@@@@@@@");
         var Usertoken = req.cookies.Usertoken;
         function verifyToken() {
             var res = "";
@@ -83,7 +102,7 @@ function configureRoutes(passport) {
                     console.log("error : " + error.message);
                     res = "error";
                 } else {
-                    console.log(decoded);
+                    //console.log("decoded : "+JSON.stringify(decoded));
                     //res.render('mytest',{"testMSG":testMSG});
                     res = "good";
                 }
@@ -93,7 +112,8 @@ function configureRoutes(passport) {
         var tokeyFLG = verifyToken();//這裏需要寫成function，不然404
         if (tokeyFLG == "error") {
             console.log("tokeyFLG:" + tokeyFLG);
-            res.render('mytest', { "testMSG": "Please re-login" });
+            //res.render('mytest', { "testMSG": "Please re-login" });
+            res.send('loginError');
         } else {
             console.log("tokeyFLG:" + tokeyFLG);
             next();
@@ -105,7 +125,6 @@ function configureRoutes(passport) {
         var testMSG = "start";
         console.log("teststart");
         console.log("testUserToken : " + Usertoken);
-
         //1 check cookies (token)
         res.render('mytest', { "testMSG": testMSG });
         // var mytest = process.env.NODE_ENV;
@@ -117,6 +136,89 @@ function configureRoutes(passport) {
     router.get('/', function (req, res, next) {
         res.render('index');
     });
+
+    router.get("/testnewAJAX",function(req,res){
+        console.log("5555555555555555555555555555555555");
+        console.log(req);
+        var IBMuserINFO = req.cookies.IBMuserINFO;
+        res.send("search");
+            });
+    
+//********************************real route start******************************************//
+
+
+//add new doc
+router.post("/API/createNewDoc",function(req,res){
+// var BO=req.BOname;
+ console.log(req.body);
+var BO="user";
+var data=req.body;
+    DBhandler.createNewDoc(BO,data,function(result){
+        console.log("newUserID: "+JSON.stringify(result));
+        // response.json(result);
+        res.send(JSON.stringify(result));
+    });
+
+        });
+
+
+//search user for report
+router.get("/API/searchUsers",function(req,res){
+// console.log("req : "+JSON.stringify(req));
+
+console.log("req.query : "+JSON.stringify(req.query));
+console.log("req.params : "+JSON.stringify(req.params));
+
+// 用req.query获取参数
+// // GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse
+// req.query.order
+// // => "desc"
+// req.query.shoe.color
+// // => "blue"
+// req.query.shoe.type
+// 用req.params获取参数
+// 例如，如果你有route/user/：name，那么“name”属性可作为req.params.name。
+
+var esq = {
+    "selector": {
+    },
+    "fields": ["_id", "_rev"],
+    "skip": 0,
+    "execution_stats": true
+}
+
+DBhandler.find("user",esq,function(result){
+    res.json(result);
+        });
+            });
+
+
+
+
+//search docs
+router.get("/getLoginUser",function(req,res){
+        var IBMuserINFO = req.cookies.IBMuserINFO;
+        res.send(IBMuserINFO);
+            });
+
+//add new doc
+router.post("/getLoginUser",function(req,res){
+    var IBMuserINFO = req.cookies.IBMuserINFO;
+    res.send("add");
+        });
+
+//update a existing doc
+router.put("/getLoginUser",function(req,res){
+    var IBMuserINFO = req.cookies.IBMuserINFO;
+    res.send("update");
+        });
+
+//delete a existing doc
+router.delete("/getLoginUser",function(req,res){
+    var IBMuserINFO = req.cookies.IBMuserINFO;
+    res.send("delete");
+        });
+//********************************real route end******************************************//
 
     /* Endpoint to greet and add a new visitor to database.
      * Send a POST request to localhost:3000/api/visitors with body
@@ -161,7 +263,9 @@ function configureRoutes(passport) {
      */
     router.get("/api/visitors", function (request, response) {
 
-  DBhandler.list(function(result){
+  DBhandler.list("mydb",{
+    include_docs: true
+},function(result){
             response.json(result);
         });
 
