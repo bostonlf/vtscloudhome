@@ -18,10 +18,10 @@ mydb = mydb("mydb");
 // parse application/x-www-form-urlencoded
 router.use(bodyParser.urlencoded({
     extended: false
-  }))
-  
-  // parse application/json
-  router.use(bodyParser.json())
+}))
+
+// parse application/json
+router.use(bodyParser.json())
 
 // 密钥
 const Tokensecret = 'vtscloud';
@@ -42,7 +42,7 @@ function configureRoutes(passport) {
         })
     );
     router.get('/success', isLoggedIn, function (req, res, next) {
-        console.log("First time login successfully , IBMuserINFO:"+JSON.stringify(req.user));
+        console.log("First time login successfully , IBMuserINFO:" + JSON.stringify(req.user));
 
         // {
         //     "issuer": {
@@ -72,8 +72,8 @@ function configureRoutes(passport) {
         // 签发 Token
         const token = jwt.sign(payload, Tokensecret, { expiresIn: '1day' });
         // 输出签发的 Token
-        console.log("first time set tokken , and generate cookie ,token:"+token);
-        console.log("cookie IBMuserINFO:"+JSON.stringify(req.user));
+        // console.log("first time set tokken , and generate cookie ,token:"+token);
+        console.log("cookie IBMuserINFO:" + JSON.stringify(req.user));
         res.cookie("Usertoken", token, { maxAge: 900000, httpOnly: true });
         res.cookie("IBMuserINFO", req.user, { maxAge: 900000, httpOnly: true });
         res.render('success', {
@@ -93,7 +93,7 @@ function configureRoutes(passport) {
     });
 
     router.use(function (req, res, next) {//這個每次都走
-        console.log("@@@@@@@@@@@@@check Usertoken start@@@@@@@@@@@@@@");
+        // console.log("@@@@@@@@@@@@@check Usertoken start@@@@@@@@@@@@@@");
         var Usertoken = req.cookies.Usertoken;
         function verifyToken() {
             var res = "";
@@ -137,88 +137,154 @@ function configureRoutes(passport) {
         res.render('index');
     });
 
-    router.get("/testnewAJAX",function(req,res){
+    router.get("/testnewAJAX", function (req, res) {
         console.log("5555555555555555555555555555555555");
         console.log(req);
         var IBMuserINFO = req.cookies.IBMuserINFO;
         res.send("search");
-            });
-    
-//********************************real route start******************************************//
-
-
-//add new doc
-router.post("/API/createNewDoc",function(req,res){
-// var BO=req.BOname;
- console.log(req.body);
-var BO="user";
-var data=req.body;
-    DBhandler.createNewDoc(BO,data,function(result){
-        console.log("newUserID: "+JSON.stringify(result));
-        // response.json(result);
-        res.send(JSON.stringify(result));
     });
 
+    //********************************real route start******************************************//
+
+
+    //add new doc
+    router.post("/API/createNewDoc", function (req, res) {
+        // var BO=req.BOname;
+        console.log(req.body);
+        var BO = "user";
+        var data = req.body;
+        DBhandler.createNewDoc(BO, data, function (result) {
+            console.log("newUserID: " + JSON.stringify(result));
+            // response.json(result);
+            res.send(JSON.stringify(result));
         });
 
+    });
 
-//search user for report
-router.get("/API/searchUsers",function(req,res){
-// console.log("req : "+JSON.stringify(req));
 
-console.log("req.query : "+JSON.stringify(req.query));
-console.log("req.params : "+JSON.stringify(req.params));
+    //search user for report
+    router.get("/API/searchUsers", function (req, res) {
+        // console.log("req : "+JSON.stringify(req));
+        // console.log("req.query : "+JSON.stringify(req.query));
+        // console.log("req.params : "+JSON.stringify(req.params));
 
-// 用req.query获取参数
-// // GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse
-// req.query.order
-// // => "desc"
-// req.query.shoe.color
-// // => "blue"
-// req.query.shoe.type
-// 用req.params获取参数
-// 例如，如果你有route/user/：name，那么“name”属性可作为req.params.name。
+        // 用req.query获取参数
+        // // GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse
+        // req.query.order
+        // // => "desc"
+        // req.query.shoe.color
+        // // => "blue"
+        // req.query.shoe.type
+        // 用req.params获取参数
+        // 例如，如果你有route/user/：name，那么“name”属性可作为req.params.name。
 
-var esq = {
-    "selector": {
-    },
-    "fields": ["_id", "_rev"],
-    "skip": 0,
-    "execution_stats": true
-}
+        var esq = {
+            "selector": {
+            },
+            "fields": ["_id", "_rev", "x_userid", "role", "x_firstname", "x_lastname", "Status", "x_modified"],
+            "skip": 0,
+            "execution_stats": true
+        }
 
-DBhandler.find("user",esq,function(result){
-    res.json(result);
+        DBhandler.find("user", esq, function (result) {
+            res.json(result);
         });
+    });
+
+    router.delete("/API/deleteSelectedUsers", function (req, res) {
+        // var BO=req.BOname;
+        console.log(req.query);
+        // query:
+        // { id: '12345',
+        // selectedUser:
+        //  [ 'e81c6a059d6f09f2188936ebd06b1ea0@1-6c68340985d3d0e2166c6420abd3751f',
+        //    'ff529e1d98caa929b5f9c8c43917a2a3@1-aa249fca3c9e9c782a55961f6a3dccbe',
+        //    'ff529e1d98caa929b5f9c8c4391fae71@1-6e8bc08cad3f0c15fef8eaa4f327b6e2' ] }
+        var Userres = [];
+        var BO = "user";
+        var data = {};
+        var selectedUser = req.query.selectedUser;
+        if (selectedUser instanceof Array) {
+            for (var i = 0; selectedUser[i]; i++) {
+                var Cuser = selectedUser[i];
+                data._id = Cuser.split("@")[0];
+                data._rev = Cuser.split("@")[1];
+                DBhandler.deleteOneRequest(BO, data, function (error, result) {
+                    var deleteOnedocRES = error ? error : result;
+                    console.log("deletedUser: " + JSON.stringify(deleteOnedocRES) + "iiiiiiii:" + i);
+                    Userres.push(deleteOnedocRES);
+
+                    // Data: { ok: true,
+                    //     id: 'b8dd82f40cd98b73d93ac2a69908d350',
+                    //     rev: '2-8e4f3c1bd5927490c3dcfbc36cfebfa0' }
+
+                    if (deleteOnedocRES.ok) {
+                        console.log("111111111111111111111" + result.id);
+                        if (result.id == selectedUser[i - 1].split("@")[0]) {
+                            console.log("deletedUserArr: " + JSON.stringify(Userres));
+                            res.send(JSON.stringify(Userres));
+                        }
+                    }
+                    // if(i==selectedUser.length-1){
+                    //     console.log("deletedUserArr: "+JSON.stringify(res));
+                    //     res.send(JSON.stringify(res));
+                    // }
+                });
+            }
+        } else {
+            data._id = req.query.selectedUser.split("@")[0];
+            data._rev = req.query.selectedUser.split("@")[1];
+            DBhandler.deleteOneRequest(BO, data, function (error, result) {
+                console.log("deletedUser: " + JSON.stringify(error ? error : result));
+                // response.json(result);
+                res.send(JSON.stringify(error ? error : result));
             });
+        }
+    });
 
+    //tested ok
+    router.delete("/API/deleteOneUsers", function (req, res) {
+        // var BO=req.BOname;
+        console.log(req.query);
+        // query:
+        // { id: '12345',
+        //   selectedUser: 'b8dd82f40cd98b73d93ac2a69908d350@1-fc073255ffdedb1a62eb5ca02e150450' }
+        var BO = "user";
+        var data = {};
+        //req.query.selectedUser is like 'b8dd82f40cd98b73d93ac2a69908d350@1-fc073255ffdedb1a62eb5ca02e150450'
+        data._id = req.query.selectedUser.split("@")[0];
+        data._rev = req.query.selectedUser.split("@")[1];
+        DBhandler.deleteOneRequest(BO, data, function (error, result) {
+            console.log("deletedUser: " + JSON.stringify(error ? error : result));
+            // response.json(result);
+            res.send(JSON.stringify(error ? error : result));
+        });
+    });
 
-
-
-//search docs
-router.get("/getLoginUser",function(req,res){
+    //search docs
+    router.get("/getLoginUser", function (req, res) {
         var IBMuserINFO = req.cookies.IBMuserINFO;
         res.send(IBMuserINFO);
-            });
+    });
 
-//add new doc
-router.post("/getLoginUser",function(req,res){
-    var IBMuserINFO = req.cookies.IBMuserINFO;
-    res.send("add");
-        });
+    //add new doc
+    router.post("/getLoginUser", function (req, res) {
+        var IBMuserINFO = req.cookies.IBMuserINFO;
+        res.send("add");
+    });
 
-//update a existing doc
-router.put("/getLoginUser",function(req,res){
-    var IBMuserINFO = req.cookies.IBMuserINFO;
-    res.send("update");
-        });
+    //update a existing doc
+    router.put("/getLoginUser", function (req, res) {
+        var IBMuserINFO = req.cookies.IBMuserINFO;
+        res.send("update");
+    });
 
-//delete a existing doc
-router.delete("/getLoginUser",function(req,res){
-    var IBMuserINFO = req.cookies.IBMuserINFO;
-    res.send("delete");
-        });
-//********************************real route end******************************************//
+    //delete a existing doc
+    router.delete("/getLoginUser", function (req, res) {
+        var IBMuserINFO = req.cookies.IBMuserINFO;
+        res.send("delete");
+    });
+    //********************************real route end******************************************//
 
     /* Endpoint to greet and add a new visitor to database.
      * Send a POST request to localhost:3000/api/visitors with body
@@ -263,9 +329,9 @@ router.delete("/getLoginUser",function(req,res){
      */
     router.get("/api/visitors", function (request, response) {
 
-  DBhandler.list("mydb",{
-    include_docs: true
-},function(result){
+        DBhandler.list("mydb", {
+            include_docs: true
+        }, function (result) {
             response.json(result);
         });
 
