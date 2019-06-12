@@ -262,7 +262,7 @@ function configureRoutes(passport) {
     });
 
     //search docs
-    router.get("/getLoginUser", function (req, res) {
+    router.get("/API/getLoginUser", function (req, res) {
         var IBMuserINFO = req.cookies.IBMuserINFO;
         res.send(IBMuserINFO);
     });
