@@ -1,0 +1,78 @@
+<style>
+.ibm-alternate-background #ibm-navigation-trail a {
+    color: #ececec
+}
+.ibm-common-overlay {
+    padding-bottom: 0 !important;
+}
+.ibm-common-overlay .content {
+    padding: 0px 20px 0 20px !important;
+    max-height: calc(100vh - 120px)  !important;
+}
+.dataTables_wrapper div > label {
+   display: inline;
+}
+.dataTables_wrapper div > label span {
+   display: block;
+}
+.dataTables_wrapper div > label span.select2-container {
+   display: inline-block;
+}
+.dataTables_wrapper div > label span.selection {
+   display: inline;
+}
+table.ibm-data-table {
+    width: 100%;
+    margin: 0 auto;
+    clear: both;
+    border-collapse: separate;
+    border-spacing: 0
+}
+table.ibm-data-table tr.wsecollapsed td:first-child {
+    position: relative;
+    padding-left: 30px;
+}
+table.ibm-data-table tr.wsecollapsed td:first-child:before {
+    top: 14px;
+    left: 4px;
+    height: 14px;
+    width: 14px;
+    display: block;
+    position: absolute;
+    color: white;
+    border: 2px solid white;
+    border-radius: 14px;
+    box-shadow: 0 0 3px #444;
+    box-sizing: content-box;
+    text-align: center;
+    font-family: 'Courier New',Courier,monospace;
+    line-height: 14px;
+    content: '+';
+    background-color: #31b131
+}
+table.ibm-data-table tr.wseexpanded td:first-child {
+    position: relative;
+    padding-left: 30px;
+}
+table.ibm-data-table tr.wseexpanded td:first-child:before {
+    top: 14px;
+    left: 4px;
+    height: 14px;
+    width: 14px;
+    display: block;
+    position: absolute;
+    color: white;
+    border: 2px solid white;
+    border-radius: 14px;
+    box-shadow: 0 0 3px #444;
+    box-sizing: content-box;
+    text-align: center;
+    font-family: 'Courier New',Courier,monospace;
+    line-height: 14px;
+    content: '-';
+    background-color: #d33333
+}
+@media screen and (max-width: 767px) {
+ .wse-mobile-hide{display:none !important}
+}
+</style>

@@ -1,0 +1,139 @@
+body {
+    padding: 50px;
+    font: 18px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+    color: #00B7FF;
+}
+
+header {
+	height: 30px
+}
+
+nav {
+	height: 20px
+}
+
+.main {
+    overflow: hidden;
+}
+
+.configuration {
+    width: 63%;
+    float: left;
+    border: 1px red;
+}
+
+.overview {
+    width: 32%;
+    float: right;
+    "
+
+}
+
+section{
+	margin-top: 30px;
+}
+
+#SAI_section span{
+	margin-right: 25px;
+}
+
+#DefaultSFsection span{
+	width: 150px;
+	margin-right: 25px;
+	display:inline-block;// span 和 label 默认情况下设置宽度是无效的，需要加display : inline-block才能有效;
+}
+
+#ADISFsection > table{
+	width: 100%;
+}
+
+#ADISFsection tr{
+	width: 100%;
+}
+
+#ADISFsection td,th{
+	width: 150px;
+}
+
+#SAI_section span{
+	width: 350px;
+	margin-right: 25px;
+	display:inline-block;// span 和 label 默认情况下设置宽度是无效的，需要加display : inline-block才能有效;
+}
+
+#SAI_section label{
+	width: 100px;
+	display:inline-block;
+}
+
+
+.overview label{
+	width: 200px;
+	display:inline-block;
+}
+
+.overview span{
+	margin-left: 20px;
+	width: 60px;
+	display:inline-block;
+}
+
+h2{
+	border-bottom: 1px solid #00F;
+}
+
+.col_2{
+margin-left: 30px;
+
+}
+
+.col_3{
+
+	margin-left: 30px;
+}
+
+footer {
+	margin-top: 10px;
+    overflow: hidden;
+}
+
+
+body {
+    /* general styles */
+    padding: 30px;
+    font-family: 'Open Sans', sans-serif;
+    //background: #f1c40f;
+    //color: #fff;
+}
+
+/* overlay styles, all needed */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 10;
+}
+
+/* just some content with arbitrary styles for explanation purposes */
+.modal {
+    width: 600px;
+    height: 500px;
+    line-height: 20px;
+    position: fixed;
+    top: 20%;
+    left: 40%;
+    margin-top: -100px;
+    margin-left: -150px;
+    background-color: #f1c40f;
+    border-radius: 5px;
+    text-align: center;
+    z-index: 11; /* 1px higher than the overlay layer */
+}
+
+

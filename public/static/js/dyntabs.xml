@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	$Id: description.xml,v 1.6 2006/11/18 16:54:32 krusch Exp $
+
+	OpenSearch description for IBM Search
+
+	Comments to the webmaster should be posted at <URL:http://www.ibm.com/contact/>
+
+	manageNow queue NUS_N_NIWWW
+	Contact Klaus Johannes Rusch/Austria/IBM
+-->
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/" xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>IBM Search</ShortName>
+  <Description>Search the IBM Web site. Search results may include links to the Lenovo Web site. See http://www.ibm.com/legal/ for terms of use.</Description>
+  <Tags>ibm innnovation computers servers systems software research db2 websphere lotus tivoli services printers "on demand"</Tags>
+  <Contact>webmaste@us.ibm.com</Contact>
+  <Url type="text/html" template="http://www.ibm.com/fscripts/search/opensearch/search.fcgi?q={searchTerms}&amp;lang={language?}&amp;en=utf&amp;startIndex={startIndex?}&amp;hpp={count?}&amp;format=html"/>
+  <Url type="application/rss+xml" template="http://www.ibm.com/fscripts/search/opensearch/search.fcgi?q={searchTerms}&amp;lang={language?}&amp;en=utf&amp;startIndex={startIndex?}&amp;hpp={count?}&amp;format=rss"/>
+  <Url type="application/atom+xml" template="http://www.ibm.com/fscripts/search/opensearch/search.fcgi?q={searchTerms}&amp;lang={language?}&amp;en=utf&amp;startIndex={startIndex?}&amp;hpp={count?}&amp;format=atom"/>
+  <LongName>IBM Search</LongName>
+  <Image width="128" height="64" type="image/png">http://www.ibm.com/search/opensearch/i/128x64.png</Image>
+  <Image width="64" height="64" type="image/png">http://www.ibm.com/search/opensearch/i/64x64.png</Image>
+  <Image width="16" height="16" type="image/png">http://www.ibm.com/search/opensearch/i/16x16.png</Image>
+  <Image width="16" height="16" type="image/vnd.microsoft.icon">http://www.ibm.com/search/opensearch/i/16x16.ico</Image>
+  <Query role="example" searchTerms="+ibm innovation"/>
+  <Developer>IBM Corporation</Developer>
+  <Attribution>Copyright © 2005, 2006 IBM Corporation. Search results may include links to the Lenovo Web site. See http://www.ibm.com/legal/ for terms of use.</Attribution>
+  <SyndicationRight>limited</SyndicationRight>
+  <AdultContent>no</AdultContent>
+  <OutputEncoding>UTF-8</OutputEncoding>
+  <InputEncoding>UTF-8</InputEncoding>
+  <moz:SearchForm>http://www.ibm.com/search/</moz:SearchForm>
+</OpenSearchDescription>
