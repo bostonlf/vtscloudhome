@@ -160,8 +160,20 @@ function configureRoutes(passport) {
         });
 
     });
+    //update a user
+    router.put("/API/UpdateUserDoc", function (req, res) {
+        // var BO=req.BOname;
+        console.log(req.body);
+        var BO = "user";
+        var data = req.body;
+        DBhandler.updateExistingDoc(BO, data, function (result) {
+            console.log("UpdateUserDoc: " + JSON.stringify(result));
+            // response.json(result);
+            res.send(JSON.stringify(result));
+        });
 
-
+    });
+    
     //search user for report
     router.get("/API/searchUsers", function (req, res) {
         // console.log("req : "+JSON.stringify(req));
@@ -189,6 +201,40 @@ function configureRoutes(passport) {
         DBhandler.find("user", esq, function (result) {
             res.json(result);
         });
+    });
+
+
+    //getoneUserINFO
+    router.get("/API/getUserINFO", function (req, res) {
+        // console.log("req : "+JSON.stringify(req));
+        // console.log("req.query : "+JSON.stringify(req.query));
+        // console.log("req.params : "+JSON.stringify(req.params));
+
+        // 用req.query获取参数
+        // // GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse
+        // req.query.order
+        // // => "desc"
+        // req.query.shoe.color
+        // // => "blue"
+        // req.query.shoe.type
+        // 用req.params获取参数
+        // 例如，如果你有route/user/：name，那么“name”属性可作为req.params.name。
+
+        var esq = {
+            "selector": {
+            "_id": req.query.userdocid
+            },
+            "fields": [],
+            "skip": 0,
+            "execution_stats": true
+        }
+        console.log("1111111111111111111 : "+JSON.stringify(req.query.userdocid));
+        DBhandler.find("user", esq, function (result) {
+            res.json(result);
+        });
+
+// res.send(req.query.userid);
+
     });
 
     router.delete("/API/deleteSelectedUsers", function (req, res) {

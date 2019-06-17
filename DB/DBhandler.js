@@ -2,7 +2,7 @@ var cloudantDB = require('./cloudant');
 
 var handler = {};
 handler.find = function (boname, esq, callback) {
-    console.log("liststart");
+    console.log("findstart"+esq);
     var names = [];
     if (!cloudantDB) {
         // response.json(names);
@@ -10,8 +10,10 @@ handler.find = function (boname, esq, callback) {
         return;
     }
 
-    // var esq = {
+    // var query = {
     //     "selector": {
+    //         "PosName": requestData.PosName,
+    //         "BOtype": "request"
     //     },
     //     "fields": ["_id", "_rev"],
     //     "skip": 0,
@@ -43,6 +45,56 @@ handler.createNewDoc = function (boname, data, callback) {
     });
 
 }
+
+handler.updateExistingDoc = function (boname, data, callback) {
+    console.log("updateExistingDoc");
+
+      data.lftestupdate = "lftestupdate";
+
+    cloudantDB(boname).insert(data, function (err, body, header) {
+        if (err) {
+            console.log('[mydb.insert] ', err.message);
+            callback("Error: " + err.message);
+            return;
+        }
+        //doc._id = body.id;
+        callback(body.id);
+    });
+}
+
+
+// exports.ModifyCurrentRequest = function(docid, newrequestdata, callback) {
+//     console.log("Updating document 'request'");
+//     initDBConnection("request", function(database) {
+//         database.get(docid, function(err, requestData) {
+//             //console.log('Error:', err);
+//             // keep a copy of the doc so we know its revision token
+//             var newrequestdataOBJ = JSON.parse(newrequestdata);
+//             requestData.requestNumber = newrequestdataOBJ.requestNumber;
+//             requestData.UserData.FormData.Fname = newrequestdataOBJ.Fname;
+//             requestData.UserData.FormData.Lname = newrequestdataOBJ.Lname;
+//             database.insert(requestData, function(err, newrequest) {
+//                 //console.log('Error:', err);
+//                 var resMSG = "updateSuccefully"
+//                 if (err) resMSG = "updateFailed"
+//                 callback(resMSG)
+//                 // var query = {
+//                 //     "selector": {
+//                 //         "BOtype": "request"
+//                 //     },
+//                 //     "fields": ["_id", "_rev", "PosName", "requestNumber", "OverviewData", "UserData", "CreateDate"],
+//                 //     "skip": 0,
+//                 //     "execution_stats": true
+//                 // }
+//                 // database.find(query, function(err, searchRESdata) {
+//                 //     var requestArr = searchRESdata.docs;
+//                 //     callback(requestArr)
+//                 // })
+//             });
+//         })
+//     })
+// }
+
 
 handler.deleteOneRequest = function (boname, data, callback) {
     console.log("start deleteOneRequest");
